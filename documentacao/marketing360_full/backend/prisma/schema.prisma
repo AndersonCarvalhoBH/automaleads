@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id        String   @id @default(uuid())
+  name      String
+  subdomain String?
+  branding  Json?
+  plan      String?
+  users     User[]
+  leads     Lead[]
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id        String  @id @default(uuid())
+  email     String  @unique
+  password  String
+  name      String
+  role      String
+  account   Account @relation(fields: [accountId], references: [id])
+  accountId String
+  createdAt DateTime @default(now())
+}
+
+model Lead {
+  id          String   @id @default(uuid())
+  account     Account  @relation(fields: [accountId], references: [id])
+  accountId   String
+  name        String?
+  email       String?  @db.VarChar(255)
+  phone       String?
+  cnpj        String?
+  source      String
+  stage       String?
+  score       Int      @default(0)
+  data        Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  events      LeadEvent[]
+  tags        Tag[]    @relation("LeadTags")
+}
+
+model LeadEvent {
+  id        String  @id @default(uuid())
+  lead      Lead    @relation(fields: [leadId], references: [id])
+  leadId    String
+  type      String
+  payload   Json?
+  createdAt DateTime @default(now())
+}
+
+model Tag {
+  id        String @id @default(uuid())
+  name      String
+  account   Account @relation(fields: [accountId], references: [id])
+  accountId String
+  leads     Lead[]  @relation("LeadTags")
+}
+
+model Automation {
+  id        String @id @default(uuid())
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id])
+  name      String
+  trigger   Json
+  actions   Json
+}
+
+model AuditLog {
+  id        String  @id @default(uuid())
+  accountId String
+  userId    String?
+  action    String
+  payload   Json?
+  createdAt DateTime @default(now())
+}

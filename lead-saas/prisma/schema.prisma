@@ -1,0 +1,261 @@
+// lead-saas/prisma/schema.prisma
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Account {
+  id          String   @id @default(uuid())
+  name        String
+  domain      String?           // domínio da conta (ex: agenciax.com)
+  status      String   @default("active") // active, suspended, trial, canceled
+  plan        String   @default("free")   // nome do plano atual (ex: free, pro, enterprise)
+  planStatus  String   @default("active") // active, past_due, canceled
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Branding básico da conta (usado em /branding)
+  logoUrl        String?                       // URL da logo
+  primaryColor   String? @default("#0ea5a4")   // cor primária
+  secondaryColor String? @default("#f43f5e")   // cor secundária
+  sidebarColor   String? @default("#111827")   // cor da sidebar
+
+  // Relacionamentos principais
+  users User[]
+  leads Lead[]
+  subscriptions Subscription[]
+  invoices Invoice[]
+  moduleUsages ModuleUsage[]
+  tickets SupportTicket[]
+
+  // Logs relacionados à conta
+  logs SystemLog[]
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("admin") // admin, user, master (superadmin)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  account   Account  @relation(fields: [accountId], references: [id])
+  accountId String
+
+  logs      SystemLog[]
+  tickets   SupportTicket[]
+}
+
+model Lead {
+  id        String   @id @default(uuid())
+  account   Account  @relation(fields: [accountId], references: [id])
+  accountId String
+
+  name      String?
+  email     String?
+  phone     String?
+  cnpj      String?
+  source    String?
+  stage     String?   // new, contact_made, proposal, won, lost...
+  score     Int?      // lead score
+
+  data      String?   // JSON serializado (campos extras)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  events    LeadEvent[]
+}
+
+model LeadEvent {
+  id        String   @id @default(uuid())
+  lead      Lead     @relation(fields: [leadId], references: [id])
+  leadId    String
+
+  type      String   // created, merged, updated, stage_changed, tag_added, imported...
+  payload   String?  // JSON serializado com detalhes do evento
+
+  createdAt DateTime @default(now())
+}
+
+// ----------------- MASTER / BILLING / PLANOS -----------------
+
+model Plan {
+  id          String   @id @default(uuid())
+  name        String   @unique        // ex: free, starter, pro, enterprise
+  externalId  String?  @unique        // id do plano no gateway (priceId / planCode)
+  description String?
+  priceMonthly Float   @default(0)    // valor mensal
+  priceYearly  Float   @default(0)    // valor anual opcional
+
+  // Limites principais
+  maxLeadsPerMonth      Int?  // null = ilimitado
+  maxScrapingPerMonth   Int?
+  allowAutomation       Boolean @default(false)
+  allowWebhooks         Boolean @default(false)
+  allowApiAccess        Boolean @default(false)
+  allowWhiteLabel       Boolean @default(false)
+  allowReports          Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id          String   @id @default(uuid())
+  account     Account  @relation(fields: [accountId], references: [id])
+  accountId   String
+
+  plan        Plan     @relation(fields: [planId], references: [id])
+  planId      String
+
+  status      String   @default("active") // active, canceled, trialing, past_due
+  startedAt   DateTime @default(now())
+  expiresAt   DateTime?
+  canceledAt  DateTime?
+
+  // Integracao Asaas
+  asaasCustomerId     String?
+  asaasSubscriptionId String?
+  gateway             String?          // stripe, pagarme, mercadopago, asaas
+  gatewayCustomerId   String?
+  gatewaySubscriptionId String?
+
+  // Dados financeiros basicos
+  billingCycle String  @default("monthly") // monthly, yearly
+  price        Float   @default(0)
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  invoices   Invoice[]
+}
+
+model Invoice {
+  id          String   @id @default(uuid())
+  account     Account  @relation(fields: [accountId], references: [id])
+  accountId   String
+
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String?
+
+  amount       Float
+  currency     String  @default("BRL")
+  status       String  @default("pending") // pending, paid, failed, canceled, overdue
+  dueDate      DateTime
+  paidAt       DateTime?
+  billingType  String?
+  externalId   String? @unique
+  invoiceUrl   String?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// Eventos de pagamento (idempotencia e auditoria de webhooks)
+model PaymentEvent {
+  id             String   @id @default(uuid())
+  gateway        String   // stripe, pagarme, mercadopago, asaas
+  gatewayEventId String   @unique
+  type           String   // invoice_paid, payment_failed, subscription_canceled...
+  payload        String?  // JSON bruto do provedor
+  processedAt    DateTime @default(now())
+
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String?
+}
+
+// Logs de webhook (debug/auditoria)
+model WebhookLog {
+  id             String   @id @default(uuid())
+  gateway        String
+  signatureValid Boolean  @default(false)
+  payload        String?  // JSON bruto
+  receivedAt     DateTime @default(now())
+}
+
+// ----------------- LOGS & MONITORAMENTO -----------------
+
+model SystemLog {
+  id        String   @id @default(uuid())
+  level     String   // info, warning, error, security, audit
+  message   String
+  context   String?  // JSON com contexto adicional
+
+  account   Account? @relation(fields: [accountId], references: [id])
+  accountId String?
+
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+
+  module    String?  // ex: auth, leads, scraping, billing, api, infra
+  createdAt DateTime @default(now())
+}
+
+model BackgroundJob {
+  id          String   @id @default(uuid())
+  type        String   // ex: scraping_instagram, scraping_maps, webhook_delivery
+  status      String   @default("queued") // queued, running, completed, failed
+  queue       String   @default("default")
+  attempts    Int      @default(0)
+  maxAttempts Int      @default(3)
+
+  payload     String?  // JSON com dados do job
+  lastError   String?
+
+  startedAt   DateTime?
+  finishedAt  DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Uso de módulos por conta (scraping, API, webhooks, etc.)
+model ModuleUsage {
+  id          String   @id @default(uuid())
+  account     Account  @relation(fields: [accountId], references: [id])
+  accountId   String
+
+  module      String   // ex: scraping_instagram, scraping_maps, api, webhooks
+  period      String   // ex: 2025-12 (competência)
+  used        Int      @default(0)
+  limit       Int?     // limite configurado para o módulo (por plano ou custom)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ----------------- SUPORTE / TICKETS -----------------
+
+model SupportTicket {
+  id          String   @id @default(uuid())
+  account     Account? @relation(fields: [accountId], references: [id])
+  accountId   String?
+
+  user        User?    @relation(fields: [userId], references: [id])
+  userId      String?
+
+  subject     String
+  status      String   @default("open") // open, in_progress, closed
+  priority    String   @default("normal") // low, normal, high, urgent
+
+  messages    String?  // JSON com histórico simples de mensagens
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model GlobalSetting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}

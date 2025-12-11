@@ -1,0 +1,471 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>DocumentaÃ§Ã£o Backend - SaaS de Scrap de Leads</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 20px;
+      line-height: 1.6;
+      background-color: #f7f7f7;
+      color: #222;
+    }
+    h1, h2, h3, h4 {
+      color: #1b3a57;
+    }
+    code, pre {
+      font-family: Consolas, "Courier New", monospace;
+      background-color: #eee;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+    pre {
+      padding: 10px;
+      overflow-x: auto;
+    }
+    .tag {
+      display: inline-block;
+      background-color: #dbeafe;
+      color: #1e3a8a;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 12px;
+      margin-right: 4px;
+    }
+    .section {
+      background-color: #fff;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #ddd;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>SaaS de Scrap de Leads â€“ DocumentaÃ§Ã£o do Backend</h1>
+  <p><strong>Status:</strong> Em desenvolvimento<br>
+     <strong>Stack:</strong> Node.js, Express, TypeScript, Prisma, SQLite, JWT</p>
+
+  <div class="section">
+    <h2>1. VisÃ£o Geral</h2>
+    <p>
+      Este backend implementa a base de um sistema SaaS de prospecÃ§Ã£o e scrap de leads, 
+      focado em mÃºltiplas fontes de entrada (importaÃ§Ãµes manuais, formulÃ¡rios, redes sociais, 
+      Google Maps, etc.), seguindo um <strong>pipeline padrÃ£o</strong>:
+    </p>
+    <pre>scrap â†’ padronizaÃ§Ã£o â†’ validaÃ§Ã£o â†’ deduplicaÃ§Ã£o â†’ envio POST interno â†’ salvamento no banco â†’ exibiÃ§Ã£o no painel</pre>
+
+    <p>Principais mÃ³dulos jÃ¡ implementados:</p>
+    <ul>
+      <li>AutenticaÃ§Ã£o e contas (Accounts, Users, Auth, /me)</li>
+      <li>Leads simples (criaÃ§Ã£o e listagem)</li>
+      <li>ImportaÃ§Ã£o manual de leads (mÃºltiplos registros)</li>
+      <li>Webhook genÃ©rico de formulÃ¡rios</li>
+      <li>ImportaÃ§Ã£o via scrap de Instagram</li>
+      <li>ImportaÃ§Ã£o via scrap de Google Maps</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>2. PadrÃ£o Oficial de Lead</h2>
+    <p>Todos os leads do sistema devem respeitar SEMPRE o seguinte modelo lÃ³gico:</p>
+    <pre>{
+  "nome": "",
+  "telefone": "",
+  "email": "",
+  "origem": "",
+  "categoria": "",
+  "tags": [],
+  "endereco": {
+    "logradouro": "",
+    "numero": "",
+    "bairro": "",
+    "cidade": "",
+    "estado": "",
+    "cep": ""
+  },
+  "dados_extras": {}
+}</pre>
+    <p>
+      Quando algum dado nÃ£o existir, usar strings vazias, array vazio ou objeto vazio â€“ 
+      mas <strong>sem remover campos</strong>.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>3. Modelagem de Banco (Prisma)</h2>
+
+    <h3>3.1. Modelo Account</h3>
+    <pre>model Account {
+  id        Int      @id @default(autoincrement())
+  name      String
+  users     User[]
+  leads     Lead[]
+  createdAt DateTime @default(now())
+}</pre>
+
+    <h3>3.2. Modelo User</h3>
+    <pre>model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  accountId Int
+  account   Account  @relation(fields: [accountId], references: [id])
+  createdAt DateTime @default(now())
+}</pre>
+
+    <h3>3.3. Modelo Lead</h3>
+    <p>Modelo de leads (com campos extras para importaÃ§Ãµes e scrap):</p>
+    <pre>model Lead {
+  id          Int      @id @default(autoincrement())
+  name        String?
+  email       String?
+  phone       String?
+  origin      String?
+  stage       String   @default("new")
+  accountId   Int
+  account     Account  @relation(fields: [accountId], references: [id])
+  createdAt   DateTime @default(now())
+
+  categoria   String?   // categoria lÃ³gica do lead (ex: maps_google, social_instagram, api_cnpj)
+  tags        String?   // JSON string com array de tags
+  endereco    String?   // JSON string com objeto de endereÃ§o
+  dadosExtras String?   // JSON string com dados_extras
+  // campo cnpj planejado (a ser implementado no prÃ³ximo passo):
+  // cnpj        String?
+}</pre>
+
+    <p>
+      ObservaÃ§Ã£o: por limitaÃ§Ãµes de JSON no SQLite, os campos <code>tags</code>, 
+      <code>endereco</code> e <code>dadosExtras</code> sÃ£o armazenados como 
+      <strong>String</strong> (JSON serializado via <code>JSON.stringify</code>).
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>4. AutenticaÃ§Ã£o e Rotas BÃ¡sicas</h2>
+
+    <h3>4.1. Login</h3>
+    <span class="tag">POST</span> <code>/auth/login</code>
+    <p>Realiza login por e-mail e senha, retornando um token JWT.</p>
+    <h4>Body (exemplo)</h4>
+    <pre>{
+  "email": "admin@example.com",
+  "password": "senha123"
+}</pre>
+    <h4>Resposta (exemplo)</h4>
+    <pre>{
+  "token": "JWT_AQUI"
+}</pre>
+
+    <h3>4.2. Rota protegida /me</h3>
+    <span class="tag">GET</span> <code>/me</code><br>
+    <p>Retorna informaÃ§Ãµes do usuÃ¡rio autenticado e sua account.</p>
+    <p>Requer header <code>Authorization: Bearer &lt;token&gt;</code>.</p>
+  </div>
+
+  <div class="section">
+    <h2>5. MÃ³dulo de Leads</h2>
+
+    <h3>5.1. Criar lead simples (modo legado)</h3>
+    <span class="tag">POST</span> <code>/leads</code> (autenticado via JWT)
+    <h4>Body (exemplo)</h4>
+    <pre>{
+  "name": "Maria Compradora",
+  "email": "maria@example.com",
+  "phone": "11988887777",
+  "origin": "site",
+  "categoria": "manual",
+  "tags": ["site", "contato"],
+  "endereco": {
+    "logradouro": "",
+    "numero": "",
+    "bairro": "",
+    "cidade": "",
+    "estado": "",
+    "cep": ""
+  },
+  "dados_extras": {
+    "obs": "Lead de teste"
+  }
+}</pre>
+    <p>Internamente, o backend converte <code>tags</code>, <code>endereco</code> e <code>dados_extras</code> para JSON string antes de salvar.</p>
+
+    <h3>5.2. Listar leads da account</h3>
+    <span class="tag">GET</span> <code>/leads</code> (autenticado via JWT)
+    <p>Retorna os registros de <code>Lead</code> associados Ã  <code>accountId</code> do usuÃ¡rio logado.</p>
+  </div>
+
+  <div class="section">
+    <h2>6. MÃ³dulo 2 â€“ ImportaÃ§Ãµes Manuais</h2>
+
+    <h3>6.1. Endpoint principal</h3>
+    <span class="tag">POST</span> <code>/leads/import/manual</code> (autenticado via JWT)
+
+    <h4>Body de entrada (estrutura geral)</h4>
+    <pre>{
+  "source_type": "csv",
+  "batch_name": "ImportaÃ§Ã£o teste mÃ³dulo 2",
+  "default": {
+    "origem": "importacao_manual",
+    "categoria": "teste_importacao",
+    "tags": ["importacao", "teste"],
+    "endereco": {
+      "logradouro": "",
+      "numero": "",
+      "bairro": "",
+      "cidade": "",
+      "estado": "",
+      "cep": ""
+    },
+    "dados_extras": {}
+  },
+  "leads": [
+    {
+      "nome": "Maria da Silva",
+      "telefone": "11999990001",
+      "email": "maria.import@example.com",
+      "origem": "",
+      "categoria": "",
+      "tags": [],
+      "endereco": {
+        "logradouro": "",
+        "numero": "",
+        "bairro": "",
+        "cidade": "SÃ£o Paulo",
+        "estado": "SP",
+        "cep": ""
+      },
+      "dados_extras": {
+        "linha_origem": "1"
+      }
+    }
+  ],
+  "options": {
+    "dedupe": true,
+    "dry_run": false
+  }
+}</pre>
+
+    <h4>Comportamento</h4>
+    <ul>
+      <li>Padroniza cada item de <code>leads</code> para o modelo oficial de lead.</li>
+      <li>Aplica defaults de <code>default</code> se campo vier vazio.</li>
+      <li>Valida e-mail bÃ¡sico (<code>includes("@")</code>).</li>
+      <li>Deduplica por e-mail e/ou telefone dentro da mesma <code>accountId</code>.</li>
+      <li><code>dry_run = true</code> â†’ simulaÃ§Ã£o sem salvar no banco.</li>
+    </ul>
+
+    <h4>Resposta (exemplo)</h4>
+    <pre>{
+  "status": "success",
+  "summary": {
+    "batch_name": "ImportaÃ§Ã£o teste mÃ³dulo 2",
+    "source_type": "csv",
+    "total_received": 2,
+    "total_valid": 2,
+    "total_imported": 2,
+    "total_duplicates": 0,
+    "total_invalid": 0,
+    "dry_run": false
+  },
+  "leads_imported": [ ... ],
+  "errors": []
+}</pre>
+  </div>
+
+  <div class="section">
+    <h2>7. MÃ³dulo 3 â€“ Webhook de FormulÃ¡rios</h2>
+
+    <h3>7.1. Endpoint genÃ©rico de formulÃ¡rios</h3>
+    <span class="tag">POST</span> <code>/webhooks/forms/generic</code> (sem JWT, uso tÃ©cnico/backend)
+
+    <h4>Body de entrada</h4>
+    <pre>{
+  "account_id": 1,
+  "source_type": "elementor",
+  "lead": {
+    "nome": "Lead do FormulÃ¡rio",
+    "telefone": "11999990000",
+    "email": "lead.form@example.com",
+    "origem": "form_elementor_home",
+    "categoria": "orcamento",
+    "tags": ["formulario", "elementor"],
+    "endereco": {
+      "logradouro": "Rua Teste",
+      "numero": "123",
+      "bairro": "Centro",
+      "cidade": "SÃ£o Paulo",
+      "estado": "SP",
+      "cep": "01000-000"
+    },
+    "dados_extras": {
+      "form_id": "elementor_001",
+      "utm_source": "google",
+      "utm_campaign": "campanha_form"
+    }
+  }
+}</pre>
+
+    <h4>Comportamento</h4>
+    <ul>
+      <li>Valida <code>account_id</code> e existÃªncia da conta.</li>
+      <li>Padroniza <code>lead</code> para o modelo oficial.</li>
+      <li>Deduplica por e-mail/telefone.</li>
+      <li>Se duplicado, retorna <code>status: "success"</code> com mensagem e o lead existente.</li>
+    </ul>
+
+    <h4>Resposta (exemplo sucesso)</h4>
+    <pre>{
+  "status": "success",
+  "lead": {
+    "id": 4,
+    "nome": "Lead do FormulÃ¡rio",
+    "telefone": "11999990000",
+    "email": "lead.form@example.com",
+    "origem": "form_elementor_home",
+    "categoria": "orcamento",
+    "tags": ["formulario", "elementor"],
+    "endereco": { ... },
+    "dados_extras": { ... },
+    "accountId": 1,
+    "createdAt": "2025-12-04T02:57:13.312Z",
+    "source_type": "elementor"
+  }
+}</pre>
+  </div>
+
+  <div class="section">
+    <h2>8. MÃ³dulo Social â€“ Instagram</h2>
+
+    <h3>8.1. Endpoint de importaÃ§Ã£o via Instagram</h3>
+    <span class="tag">POST</span> <code>/social/instagram/import</code> (sem JWT, uso tÃ©cnico/backend)
+
+    <h4>Body de entrada</h4>
+    <pre>{
+  "account_id": 1,
+  "source_type": "instagram",
+  "context": {
+    "mode": "hashtag",
+    "source_value": "#dentistasp"
+  },
+  "profiles": [
+    {
+      "username": "clinica_x",
+      "full_name": "ClÃ­nica X Odontologia",
+      "bio": "Atendimento humanizado â€¢ Implantes â€¢ WhatsApp: (11) 99999-0000",
+      "email": "contato@clinicax.com.br",
+      "phone": "+55 (11) 99999-0000",
+      "whatsapp": "5511999990000",
+      "website": "https://clinicax.com.br",
+      "city": "SÃ£o Paulo",
+      "state": "SP",
+      "country": "BR",
+      "raw": {}
+    }
+  ],
+  "options": {
+    "dedupe": true,
+    "dry_run": false
+  }
+}</pre>
+
+    <h4>PadronizaÃ§Ã£o</h4>
+    <ul>
+      <li><code>nome</code> = <code>full_name</code> ou <code>username</code>.</li>
+      <li><code>telefone</code> = <code>whatsapp</code> ou <code>phone</code>.</li>
+      <li><code>origem</code> = <code>"instagram_" + context.mode</code>.</li>
+      <li><code>categoria</code> = <code>"social_instagram"</code>.</li>
+      <li><code>tags</code> = ["instagram", &lt;mode&gt;, &lt;source_value&gt;].</li>
+      <li>
+        <code>endereco</code> usa <code>city</code> e <code>state</code>, demais campos vazios.
+      </li>
+      <li><code>dados_extras</code> inclui username, website, bio, context etc.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>9. MÃ³dulo Maps â€“ Google Maps</h2>
+
+    <h3>9.1. Endpoint de importaÃ§Ã£o via Google Maps</h3>
+    <span class="tag">POST</span> <code>/maps/google/import</code> (sem JWT, uso tÃ©cnico/backend)
+
+    <h4>Body de entrada</h4>
+    <pre>{
+  "account_id": 1,
+  "source_type": "google_maps",
+  "context": {
+    "query": "clÃ­nica odontolÃ³gica",
+    "location": "SÃ£o Paulo, SP",
+    "radius_meters": 5000,
+    "category": "dentista"
+  },
+  "places": [
+    {
+      "place_id": "place_001",
+      "name": "ClÃ­nica Sorriso SP",
+      "phone": "+55 11 99999-0000",
+      "international_phone": "5511999990000",
+      "formatted_phone": "(11) 99999-0000",
+      "email": "contato@clinicasorriso.com.br",
+      "website": "https://clinicasorriso.com.br",
+      "address": {
+        "full": "Rua Exemplo, 123 - Centro, SÃ£o Paulo - SP, 01000-000",
+        "street": "Rua Exemplo",
+        "number": "123",
+        "neighborhood": "Centro",
+        "city": "SÃ£o Paulo",
+        "state": "SP",
+        "postal_code": "01000-000",
+        "country": "BR"
+      },
+      "category": "ClÃ­nica odontolÃ³gica",
+      "rating": 4.7,
+      "user_ratings_total": 152,
+      "maps_url": "https://maps.google.com/?cid=123456",
+      "raw": {}
+    }
+  ],
+  "options": {
+    "dedupe": true,
+    "dry_run": false
+  }
+}</pre>
+
+    <h4>PadronizaÃ§Ã£o</h4>
+    <ul>
+      <li><code>nome</code> = <code>name</code>.</li>
+      <li><code>telefone</code> = <code>international_phone</code> ou <code>phone</code> ou <code>formatted_phone</code>.</li>
+      <li><code>origem</code> = <code>"google_maps"</code>.</li>
+      <li><code>categoria</code> = <code>"maps_google"</code>.</li>
+      <li><code>tags</code> = ["google_maps", query, location, category].</li>
+      <li><code>endereco</code> mapeado de <code>address</code> (street, number, neighborhood, city, state, postal_code).</li>
+      <li><code>dados_extras</code> inclui place_id, rating, maps_url, context etc.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>10. PrÃ³ximos MÃ³dulos Planejados</h2>
+    <ul>
+      <li>
+        <strong>MÃ³dulo CNPJ â€“ /corp/cnpj/import</strong><br>
+        <em>Status:</em> Modelado conceitualmente (JSON de entrada/saÃ­da definido, dedupe por CNPJ/email/telefone, campo opcional <code>cnpj</code> em <code>Lead</code>). ImplementaÃ§Ã£o prÃ¡tica (migration e rota) serÃ¡ o prÃ³ximo passo.
+      </li>
+      <li>
+        <strong>Outras fontes:</strong> e-mail/SMTP, crawlers genÃ©ricos de sites, marketplaces, mensageria/WhatsApp, enriquecimento de leads etc.
+      </li>
+      <li>
+        <strong>Painel Web (Front-end):</strong> telas para gestÃ£o de contas, leads, importaÃ§Ãµes, scrapers, integraÃ§Ãµes e configuraÃ§Ãµes white-label.
+      </li>
+    </ul>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,409 @@
+/* Layout geral */
+.app-layout {
+  display: flex;
+  height: 100vh;
+  background: #f5f7fa;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.sidebar-logo-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 12px;
+  background: #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 700;
+  margin-right: 8px;
+}
+
+.sidebar-logo-text {
+  font-weight: 700;
+  font-size: 18px;
+  color: #0f172a;
+}
+
+.sidebar-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.sidebar-item {
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #4b5563;
+  cursor: pointer;
+}
+
+.sidebar-item:hover {
+  background: #f3f4f6;
+}
+
+.sidebar-item-active {
+  background: #ecfdf5;
+  color: #047857;
+  font-weight: 600;
+}
+
+.sidebar-icon {
+  font-size: 14px;
+  width: 18px;
+}
+
+/* Área principal */
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Topbar */
+.topbar {
+  height: 60px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topbar-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+.topbar-search {
+  width: 260px;
+}
+
+.topbar-search-input {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  padding: 6px 12px;
+  font-size: 13px;
+  background: #f9fafb;
+}
+
+.topbar-search-input:focus {
+  outline: none;
+  border-color: #10b981;
+  background: #ffffff;
+}
+
+.topbar-icon-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.topbar-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: #d1d5db;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  color: #111827;
+}
+
+.topbar-username {
+  font-size: 14px;
+  color: #111827;
+}
+
+/* Dropdown usuário */
+.topbar-user-menu {
+  position: absolute;
+  right: 0;
+  top: 44px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+  z-index: 10;
+}
+
+.user-menu-item {
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #111827;
+  cursor: pointer;
+}
+
+.user-menu-item:hover {
+  background: #f3f4f6;
+}
+
+.user-menu-item-danger {
+  color: #b91c1c;
+}
+
+/* Conteúdo */
+.content {
+  flex: 1;
+  padding: 20px 24px 24px;
+  overflow-y: auto;
+}
+
+.alert {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.alert-error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+/* Cards de métricas */
+.cards-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.metric-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+  border: 1px solid #e5e7eb;
+}
+
+.metric-label {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.metric-value {
+  font-size: 26px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.metric-helper {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 4px;
+}
+
+/* Gráficos */
+.charts-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1.3fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.chart-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+  border: 1px solid #e5e7eb;
+}
+
+.chart-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+}
+
+.chart-header h2 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.chart-subtitle {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* Parte inferior: tabela + fontes */
+.bottom-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr);
+  gap: 16px;
+}
+
+.bottom-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+  border: 1px solid #e5e7eb;
+}
+
+.bottom-card-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.bottom-card-header h2 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+  color: #111827;
+}
+
+.bottom-card-subtitle {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.recent-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.recent-table th,
+.recent-table td {
+  padding: 6px 4px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.recent-table th {
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.recent-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.muted {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* Fontes de leads */
+.source-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.source-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 13px;
+}
+
+.source-name {
+  color: #4b5563;
+}
+
+.source-count {
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Responsivo */
+@media (max-width: 1024px) {
+  .cards-row {
+    grid-template-columns: 1fr;
+  }
+
+  .charts-row {
+    grid-template-columns: 1fr;
+  }
+
+  .bottom-row {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    display: none; /* em uma versão futura podemos fazer um menu hamburguer */
+  }
+
+  .topbar-title {
+    font-size: 18px;
+  }
+}

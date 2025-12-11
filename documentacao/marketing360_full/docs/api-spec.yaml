@@ -1,0 +1,62 @@
+openapi: 3.0.3
+info:
+  title: Marketing360 API
+  version: 1.0.0
+servers:
+  - url: http://localhost:4000/api/v1
+paths:
+  /auth/login:
+    post:
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: OK
+  /leads:
+    get:
+      summary: List leads
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Create lead
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                phone:
+                  type: string
+                source:
+                  type: string
+      responses:
+        '201':
+          description: Created
+  /webhooks/form:
+    post:
+      summary: Receive form webhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Accepted

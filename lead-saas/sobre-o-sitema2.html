@@ -1,0 +1,962 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Plataforma de Leads & Marketing 360 â€“ VisÃ£o Geral</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-alt: #020818;
+      --card: #020617;
+      --accent: #3b82f6;
+      --accent-soft: rgba(59,130,246,0.12);
+      --accent-strong: #60a5fa;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: rgba(148,163,184,0.35);
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --shadow-soft: 0 18px 45px rgba(15,23,42,0.75);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #020617, #000);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    header {
+      padding: 28px 20px 16px;
+      border-bottom: 1px solid rgba(148,163,184,0.25);
+      backdrop-filter: blur(18px);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: linear-gradient(to bottom, rgba(15,23,42,0.96), rgba(15,23,42,0.90), transparent);
+    }
+
+    .nav {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+
+    .logo-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #facc15, #3b82f6);
+      box-shadow: 0 0 0 2px rgba(15,23,42,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 14px;
+      font-size: 13px;
+      color: var(--muted);
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav-links a {
+      padding: 4px 10px;
+      border-radius: 999px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .nav-links a:hover {
+      background: rgba(148,163,184,0.16);
+      color: var(--text);
+    }
+
+    .hero {
+      max-width: 1120px;
+      margin: 8px auto 32px;
+      padding: 24px 20px 10px;
+    }
+
+    .hero-grid {
+      display: grid;
+      gap: 26px;
+    }
+
+    @media (min-width: 900px) {
+      .hero-grid {
+        grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+        align-items: center;
+      }
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(148,163,184,0.4);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #93c5fd;
+      margin-bottom: 12px;
+    }
+
+    .hero h1 {
+      font-size: clamp(28px, 4vw, 38px);
+      margin: 0 0 8px;
+    }
+
+    .hero-title-highlight {
+      background: linear-gradient(120deg, #60a5fa, #a855f7, #facc15);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      max-width: 560px;
+      margin-bottom: 16px;
+    }
+
+    .hero-pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .pill {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(148,163,184,0.35);
+      color: #e5e7eb;
+    }
+
+    .hero-steps {
+      font-size: 12px;
+      color: #cbd5f5;
+      margin-bottom: 18px;
+    }
+
+    .hero-steps span {
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .hero-cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-primary {
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: white;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: default;
+      box-shadow: 0 12px 30px rgba(37,99,235,0.5);
+    }
+
+    .btn-ghost {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      font-size: 12px;
+      color: #e5e7eb;
+      cursor: default;
+    }
+
+    .hero-note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .hero-visual {
+      background: radial-gradient(circle at top, rgba(37,99,235,0.4), rgba(15,23,42,0.95));
+      border-radius: var(--radius-lg);
+      padding: 18px 18px 16px;
+      border: 1px solid rgba(148,163,184,0.4);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .hero-visual-title {
+      font-size: 13px;
+      color: #bfdbfe;
+      margin-bottom: 4px;
+    }
+
+    .hero-visual-sub {
+      font-size: 11px;
+      color: #e5e7eb;
+      margin-bottom: 10px;
+    }
+
+    .pipeline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 11px;
+      margin-bottom: 12px;
+    }
+
+    .pipeline-step {
+      flex: 1 1 90px;
+      min-width: 0;
+      padding: 6px 8px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(148,163,184,0.4);
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .pipeline-arrow {
+      width: 16px;
+      text-align: center;
+      opacity: 0.7;
+    }
+
+    .tenant-illustration {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 8px;
+      font-size: 11px;
+    }
+
+    .tenant-card {
+      background: rgba(15,23,42,0.96);
+      border-radius: 10px;
+      border: 1px solid rgba(148,163,184,0.5);
+      padding: 6px 8px;
+    }
+
+    .tenant-title {
+      font-size: 11px;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tenant-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    .tenant-leads-row {
+      display: flex;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .lead-pill {
+      flex: 1;
+      border-radius: 999px;
+      padding: 2px 4px;
+      background: rgba(30,64,175,0.7);
+      text-align: center;
+      font-size: 9px;
+      white-space: nowrap;
+    }
+
+    .section {
+      max-width: 1120px;
+      margin: 0 auto 32px;
+      padding: 0 20px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .section-kicker {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #93c5fd;
+    }
+
+    .section-title {
+      font-size: 20px;
+      margin: 2px 0 4px;
+    }
+
+    .section-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      max-width: 520px;
+    }
+
+    .modules-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+      font-size: 11px;
+    }
+
+    .modules-nav a {
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      background: rgba(15,23,42,0.9);
+      color: var(--muted);
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .modules-nav a:hover {
+      background: var(--accent-soft);
+      color: #e5e7eb;
+      border-color: var(--accent);
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    @media (min-width: 880px) {
+      .grid-2 {
+        grid-template-columns: repeat(2, minmax(0,1fr));
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      padding: 16px 16px 18px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .card h3 {
+      margin: 0 0 4px;
+      font-size: 15px;
+    }
+
+    .card-tagline {
+      font-size: 12px;
+      color: #cbd5f5;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      font-size: 13px;
+      color: #e5e7eb;
+      margin: 0 0 6px;
+    }
+
+    .card ul {
+      padding-left: 18px;
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: #d1d5db;
+    }
+
+    .card ul li {
+      margin-bottom: 3px;
+    }
+
+    .label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .label-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .highlight {
+      color: #facc15;
+      font-weight: 500;
+    }
+
+    .pill-mini {
+      display: inline-block;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(148,163,184,0.5);
+      margin-right: 4px;
+      margin-top: 4px;
+    }
+
+    .roadmap-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    @media (min-width: 880px) {
+      .roadmap-grid {
+        grid-template-columns: repeat(3, minmax(0,1fr));
+      }
+    }
+
+    .roadmap-card {
+      background: #020617;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,0.5);
+      padding: 12px 12px 14px;
+      box-shadow: 0 14px 35px rgba(15,23,42,0.9);
+      font-size: 12px;
+    }
+
+    .roadmap-card h4 {
+      margin: 0 0 4px;
+      font-size: 13px;
+      color: #bfdbfe;
+    }
+
+    .roadmap-card p {
+      margin: 0 0 4px;
+      color: #e5e7eb;
+      font-size: 12px;
+    }
+
+    .roadmap-tag {
+      display: inline-block;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(6,95,70,0.3);
+      color: #6ee7b7;
+      margin-bottom: 4px;
+    }
+
+    .footer-note {
+      max-width: 1120px;
+      margin: 16px auto 32px;
+      padding: 0 20px 8px;
+      font-size: 11px;
+      color: var(--muted);
+      border-top: 1px solid rgba(148,163,184,0.3);
+      padding-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <header>
+    <div class="nav">
+      <div class="logo">
+        <div class="logo-mark">L</div>
+        <span>LeadsOS 360</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#visao">VisÃ£o 360</a>
+        <a href="#multi-tenant">Multi-tenant</a>
+        <a href="#modulos-hoje">MÃ³dulos atuais</a>
+        <a href="#roadmap">Roadmap 360</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="visao">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-badge">
+          <span>â—</span>
+          Plataforma de Leads & Marketing 360
+        </div>
+        <h1>
+          Do <span class="hero-title-highlight">scrap</span> ao
+          <span class="hero-title-highlight">fechamento</span> em um Ãºnico backend.
+        </h1>
+        <p class="hero-subtitle">
+          Um sistema pensado para agÃªncias e operaÃ§Ãµes comerciais que querem controlar
+          todo o ciclo de geraÃ§Ã£o de demanda: da captura bruta do lead atÃ© o CRM,
+          automaÃ§Ãµes de WhatsApp, e anÃ¡lise de performance por canal.
+        </p>
+
+        <div class="hero-pill-row">
+          <span class="pill">Coleta multi-fonte</span>
+          <span class="pill">Enriquecimento & dedupe</span>
+          <span class="pill">CRM Kanban & automaÃ§Ãµes</span>
+          <span class="pill">Pronto para white label</span>
+        </div>
+
+        <div class="hero-steps">
+          <span>ðŸ“¥ Captura (scrap, formulÃ¡rios, mapas, redes)</span> â†’
+          <span>ðŸ§  Tratamento (padronizaÃ§Ã£o, validaÃ§Ã£o, score)</span> â†’
+          <span>ðŸ“Š CRM & funil</span> â†’
+          <span>ðŸ’¬ WhatsApp & automaÃ§Ã£o</span> â†’
+          <span>ðŸ’¼ Fechamento & relatÃ³rios</span>
+        </div>
+
+        <div class="hero-cta-row">
+          <button class="btn-primary">VisÃ£o de produto para investidores</button>
+          <button class="btn-ghost">Arquitetura pronta para escalar como SaaS</button>
+        </div>
+        <p class="hero-note">
+          A base jÃ¡ estÃ¡ implementada em Node/TypeScript + Prisma/SQLite. Os prÃ³ximos mÃ³dulos
+          ampliam a visÃ£o para um verdadeiro Marketing 360, com IA, automaÃ§Ãµes e modo agÃªncia.
+        </p>
+      </div>
+
+      <div class="hero-visual">
+        <div class="hero-visual-title">Pipeline central de inteligÃªncia de leads</div>
+        <div class="hero-visual-sub">
+          Tudo o que entra passa pelo mesmo funil, independente da fonte.
+        </div>
+        <div class="pipeline">
+          <div class="pipeline-step">Scrap &amp; captura</div>
+          <div class="pipeline-arrow">âžœ</div>
+          <div class="pipeline-step">PadronizaÃ§Ã£o</div>
+          <div class="pipeline-arrow">âžœ</div>
+          <div class="pipeline-step">ValidaÃ§Ã£o &amp; dedupe</div>
+          <div class="pipeline-arrow">âžœ</div>
+          <div class="pipeline-step">CRM &amp; automaÃ§Ã£o</div>
+          <div class="pipeline-arrow">âžœ</div>
+          <div class="pipeline-step">BI &amp; fechamento</div>
+        </div>
+
+        <div class="hero-visual-title">Multi-contas & equipes em paralelo</div>
+        <div class="hero-visual-sub">
+          Cada cliente em uma â€œcaixaâ€ prÃ³pria de leads, com sua prÃ³pria equipe.
+        </div>
+
+        <!-- ILUSTRAÃ‡ÃƒO CONCEITUAL DE ACCOUNTS / USUÃRIOS -->
+        <div class="tenant-illustration">
+          <div class="tenant-card">
+            <div class="tenant-title">
+              <span class="tenant-dot"></span>
+              AgÃªncia Alfa
+            </div>
+            <div style="font-size:10px;color:#9ca3af;">Conta 01 â€¢ 5 usuÃ¡rios</div>
+            <div class="tenant-leads-row">
+              <div class="lead-pill">Leads Social</div>
+              <div class="lead-pill">Leads Maps</div>
+            </div>
+          </div>
+          <div class="tenant-card">
+            <div class="tenant-title">
+              <span class="tenant-dot" style="background:#f97316;"></span>
+              IndÃºstria Beta
+            </div>
+            <div style="font-size:10px;color:#9ca3af;">Conta 02 â€¢ 8 usuÃ¡rios</div>
+            <div class="tenant-leads-row">
+              <div class="lead-pill" style="background:#7c3aed;">Leads CNPJ</div>
+              <div class="lead-pill">Inbound</div>
+            </div>
+          </div>
+          <div class="tenant-card">
+            <div class="tenant-title">
+              <span class="tenant-dot" style="background:#22c55e;"></span>
+              Franquia Gamma
+            </div>
+            <div style="font-size:10px;color:#9ca3af;">Conta 03 â€¢ 3 usuÃ¡rios</div>
+            <div class="tenant-leads-row">
+              <div class="lead-pill" style="background:#0d9488;">WhatsApp</div>
+              <div class="lead-pill" style="background:#4b5563;">Eventos</div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-note">
+          Visualmente: cada â€œblocoâ€ Ã© uma conta separada, com seus prÃ³prios leads
+          e times. Ideal para modelo SaaS multi-cliente e operaÃ§Ã£o em modo agÃªncia.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MULTI-TENANT (ACCOUNTS & USERS) -->
+  <section class="section" id="multi-tenant">
+    <div class="section-header">
+      <div>
+        <div class="section-kicker">Arquitetura SaaS</div>
+        <h2 class="section-title">Accounts & UsuÃ¡rios: como o sistema escala</h2>
+        <p class="section-subtitle">
+          A base foi desenhada para ser multi-tenant desde o primeiro dia. Isso significa:
+          um Ãºnico backend, mÃºltiplas empresas, equipes separadas e dados totalmente isolados.
+          Perfeito para vender como software, com planos mensais, marca branca e modo agÃªncia.
+        </p>
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="label">
+          <span class="label-dot"></span>
+          Accounts (Contas)
+        </div>
+        <h3>Cada cliente em um â€œcontainerâ€ separado de leads</h3>
+        <p class="card-tagline">
+          Pense em cada conta como um â€œworkspaceâ€ prÃ³prio: uma empresa, uma operaÃ§Ã£o,
+          ou um cliente da sua agÃªncia.
+        </p>
+        <p>
+          O sistema foi pensado para ser usado por vÃ¡rios clientes ao mesmo tempo. Cada conta
+          representa uma empresa ou operaÃ§Ã£o diferente, com:
+        </p>
+        <ul>
+          <li>Seu prÃ³prio conjunto de usuÃ¡rios.</li>
+          <li>Sua prÃ³pria base de leads, totalmente isolada das demais.</li>
+          <li>ConfiguraÃ§Ãµes e integraÃ§Ãµes especÃ­ficas (WhatsApp, automaÃ§Ãµes, regras de negÃ³cio).</li>
+        </ul>
+        <p>
+          Para o modelo de negÃ³cio, isso habilita:
+        </p>
+        <ul>
+          <li><strong>SeparaÃ§Ã£o clara</strong> de dados entre clientes â€“ requisito para LGPD.</li>
+          <li><strong>Escalabilidade</strong> para mÃºltiplas empresas simultÃ¢neas.</li>
+          <li><strong>Modelos de cobranÃ§a flexÃ­veis</strong>: por conta, por usuÃ¡rio, por volume de leads.</li>
+          <li><strong>White label real</strong>: cada conta pode ter sua marca e domÃ­nio prÃ³prios no futuro.</li>
+        </ul>
+        <p class="note">
+          Para investidores: a lÃ³gica de accounts Ã© o que transforma o projeto em plataforma,
+          nÃ£o em â€œsistema Ãºnicoâ€ de uso interno.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="label">
+          <span class="label-dot" style="background:#f97316;"></span>
+          UsuÃ¡rios & Acesso
+        </div>
+        <h3>Times inteiros operando dentro de cada conta</h3>
+        <p class="card-tagline">
+          SDR, closer, gestor, marketingâ€¦ cada pessoa com login e visÃ£o limitada ao que precisa ver.
+        </p>
+        <p>
+          Dentro de cada conta, Ã© possÃ­vel ter vÃ¡rios usuÃ¡rios. Isso permite que times comerciais
+          e de marketing trabalhem em cima da mesma base de leads, com:
+        </p>
+        <ul>
+          <li>Login por e-mail e senha com autenticaÃ§Ã£o JWT.</li>
+          <li>Rota <code>/me</code> para o sistema saber â€œquem estÃ¡ logadoâ€ o tempo todo.</li>
+          <li>Base segura para criar dashboards exclusivos por usuÃ¡rio ou por papel (perfil).</li>
+        </ul>
+        <p>
+          Com isso, tudo o que Ã© sensÃ­vel â€” como visualizaÃ§Ã£o de leads, criaÃ§Ã£o de oportunidades,
+          automaÃ§Ãµes ou dados de campanha â€” pode ser protegido por permissÃ£o, garantindo que:
+        </p>
+        <ul>
+          <li>Um vendedor veja apenas os leads que pertencem Ã  sua conta (ou carteira).</li>
+          <li>AgÃªncias controlem o acesso de cada cliente.</li>
+          <li>A plataforma suporte, no futuro, nÃ­veis de permissÃ£o mais finos (admin, gestor, SDR, etc.).</li>
+        </ul>
+        <p class="note">
+          Essa combinaÃ§Ã£o (Accounts + Users) Ã© o nÃºcleo multi-tenant: Ã© o que permite
+          administrar dezenas ou centenas de empresas diferentes em um Ãºnico produto.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MÃ“DULOS ATUAIS -->
+  <section class="section" id="modulos-hoje">
+    <div class="section-header">
+      <div>
+        <div class="section-kicker">MÃ³dulos jÃ¡ implementados</div>
+        <h2 class="section-title">FundaÃ§Ã£o tÃ©cnica pronta para crescer</h2>
+        <p class="section-subtitle">
+          Abaixo estÃ£o os blocos que jÃ¡ existem na base do sistema: captura de leads,
+          padronizaÃ§Ã£o e organizaÃ§Ã£o multi-fonte. Em cima disso, entram CRM, automaÃ§Ãµes
+          e BI para completar o Marketing 360.
+        </p>
+      </div>
+    </div>
+
+    <div class="modules-nav">
+      <a href="#modulo-leads">NÃºcleo de Leads</a>
+      <a href="#modulo-import">ImportaÃ§Ãµes Manuais</a>
+      <a href="#modulo-forms">Webhook de FormulÃ¡rios</a>
+      <a href="#modulo-instagram">Instagram</a>
+      <a href="#modulo-maps">Google Maps</a>
+    </div>
+
+    <div class="grid grid-2">
+      <!-- NÃºcleo de leads -->
+      <div class="card" id="modulo-leads">
+        <div class="label">
+          <span class="label-dot"></span>
+          MÃ³dulo de Leads
+        </div>
+        <h3>Um padrÃ£o Ãºnico para todos os leads</h3>
+        <p class="card-tagline">
+          Toda entrada de dado vira um lead com a mesma estrutura. Simples de integrar, fÃ¡cil de analisar.
+        </p>
+        <p>
+          NÃ£o importa se o lead veio de um formulÃ¡rio, de uma planilha, de um scrap no Instagram
+          ou de uma busca no Google Maps: ele Ã© padronizado em um modelo Ãºnico contendo:
+        </p>
+        <ul>
+          <li>InformaÃ§Ãµes principais: nome, telefone, e-mail, origem, categoria.</li>
+          <li>Tags para segmentaÃ§Ã£o e relatÃ³rios por tipo de captura.</li>
+          <li>EndereÃ§o estruturado (rua, nÃºmero, bairro, cidade, estado, CEP).</li>
+          <li><span class="highlight">dados_extras</span> para qualquer informaÃ§Ã£o adicional da fonte.</li>
+        </ul>
+        <p class="note">
+          Isso prepara o terreno para funis, filtros por canal e segmentaÃ§Ãµes avanÃ§adas por
+          localizaÃ§Ã£o, tipo de cliente ou intenÃ§Ã£o.
+        </p>
+      </div>
+
+      <!-- ImportaÃ§Ãµes manuais -->
+      <div class="card" id="modulo-import">
+        <div class="label">
+          <span class="label-dot" style="background:#22c55e;"></span>
+          MÃ³dulo 2 â€“ ImportaÃ§Ãµes Manuais
+        </div>
+        <h3>Traga suas bases antigas para dentro do sistema</h3>
+        <p class="card-tagline">
+          Planilhas, CSV, listas de eventos, cadastros antigos: tudo pode virar lead vivo.
+        </p>
+        <p>
+          O sistema permite que o usuÃ¡rio suba mÃºltiplos leads em lote, vindos de arquivos
+          ou colados diretamente no painel (que serÃ¡ construÃ­do por cima dessa API).
+        </p>
+        <ul>
+          <li>ImportaÃ§Ã£o em massa com aplicaÃ§Ã£o de â€œdefaultsâ€ de origem/categoria.</li>
+          <li>ValidaÃ§Ã£o bÃ¡sica de dados (e-mails, telefones etc.).</li>
+          <li>DeduplicaÃ§Ã£o por e-mail/telefone para evitar inflar a base.</li>
+          <li>Modo <strong>dry run</strong> para simular o impacto da importaÃ§Ã£o antes de gravar.</li>
+        </ul>
+        <p class="note">
+          Ideal para onboarding de novos clientes (subir base antiga) e para campanhas sazonais
+          baseadas em listas especÃ­ficas.
+        </p>
+      </div>
+
+      <!-- Webhook forms -->
+      <div class="card" id="modulo-forms">
+        <div class="label">
+          <span class="label-dot" style="background:#f97316;"></span>
+          MÃ³dulo 3 â€“ Webhook de FormulÃ¡rios
+        </div>
+        <h3>Integre qualquer formulÃ¡rio em uma rota Ãºnica</h3>
+        <p class="card-tagline">
+          Elementor, Gravity, Typeform, JotForm, Google Forms, Zapier, Make, n8nâ€¦
+          se envia POST, consegue falar com a plataforma.
+        </p>
+        <p>
+          Em vez de criar integraÃ§Ãµes diferentes para cada ferramenta, o backend
+          expÃµe um webhook genÃ©rico de formulÃ¡rios. Ele:
+        </p>
+        <ul>
+          <li>Recebe os dados jÃ¡ associados a uma conta especÃ­fica.</li>
+          <li>Padroniza no formato de lead e aplica deduplicaÃ§Ã£o.</li>
+          <li>Salva imediatamente o lead na base correta.</li>
+        </ul>
+        <p class="note">
+          Isso transforma a plataforma em um â€œhubâ€ de captura, onde qualquer landing page
+          pode virar fonte de leads sem esforÃ§o extra.
+        </p>
+      </div>
+
+      <!-- Instagram -->
+      <div class="card" id="modulo-instagram">
+        <div class="label">
+          <span class="label-dot" style="background:#e11d48;"></span>
+          MÃ³dulo Social â€“ Instagram
+        </div>
+        <h3>Transforme perfis e hashtags em listas de prospecÃ§Ã£o</h3>
+        <p class="card-tagline">
+          Da bio, seguidores e comentÃ¡rios para uma base organizada de leads.
+        </p>
+        <p>
+          Um endpoint dedicado recebe dados de um scraper de Instagram e converte
+          isso em leads utilizÃ¡veis:
+        </p>
+        <ul>
+          <li>Mapeia username, nome, e-mail, telefone, cidade, estado.</li>
+          <li>Registra contexto: hashtag utilizada, origem (perfil, seguidores, comentÃ¡rios etc.).</li>
+          <li>Gera tags automÃ¡ticas como â€œinstagramâ€, â€œhashtagâ€, â€œ#palavra-chaveâ€.</li>
+          <li>Ignora perfis sem contato (sem e-mail e sem telefone) para manter a qualidade da base.</li>
+        </ul>
+        <p class="note">
+          Perfeito para estratÃ©gias de social selling, onde a origem orgÃ¢nica vira
+          combustÃ­vel para o time de outbound.
+        </p>
+      </div>
+
+      <!-- Maps -->
+      <div class="card" id="modulo-maps">
+        <div class="label">
+          <span class="label-dot" style="background:#0ea5e9;"></span>
+          MÃ³dulo Maps â€“ Google Maps
+        </div>
+        <h3>Mapeie mercados locais com poucos cliques</h3>
+        <p class="card-tagline">
+          Busque empresas por categoria e regiÃ£o, e transforme os resultados em leads trabalhÃ¡veis.
+        </p>
+        <p>
+          O mÃ³dulo de Google Maps recebe lugares (places) jÃ¡ scrapados por uma ferramenta externa
+          e cuida do resto:
+        </p>
+        <ul>
+          <li>Organiza nome, telefone, e-mail, endereÃ§o completo, categoria e avaliaÃ§Ãµes.</li>
+          <li>Classifica a origem como â€œmaps_googleâ€, facilitando relatÃ³rios por canal.</li>
+          <li>Gera tags com base na consulta (termo, cidade, categoria).</li>
+          <li>Refusa registros sem contato para evitar â€œleads vaziosâ€.</li>
+        </ul>
+        <p class="note">
+          Com isso, Ã© possÃ­vel montar listas segmentadas por nicho (clÃ­nicas, oficinas, restaurantes)
+          e regiÃ£o, com potencial direto de uso em campanhas comerciais.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROADMAP 360 -->
+  <section class="section" id="roadmap">
+    <div class="section-header">
+      <div>
+        <div class="section-kicker">PrÃ³ximo nÃ­vel</div>
+        <h2 class="section-title">Roadmap de Marketing 360</h2>
+        <p class="section-subtitle">
+          A fundaÃ§Ã£o tÃ©cnica jÃ¡ estÃ¡ pronta. A visÃ£o de produto Ã© chegar em um ecossistema completo
+          de Marketing 360: coleta inteligente, enriquecimento via IA, CRM Kanban, automaÃ§Ãµes de WhatsApp,
+          BI e modo agÃªncia com white label.
+        </p>
+      </div>
+    </div>
+
+    <div class="roadmap-grid">
+      <div class="roadmap-card">
+        <span class="roadmap-tag">Coleta avanÃ§ada</span>
+        <h4>Social Listening & Novos NegÃ³cios</h4>
+        <p>
+          Monitorar menÃ§Ãµes em Instagram, TikTok, YouTube e X para capturar
+          leads que pedem preÃ§o, demonstram interesse ou reclamam de concorrentes.
+        </p>
+        <p>
+          Scrap diÃ¡rio de Google Maps para identificar novos negÃ³cios na regiÃ£o,
+          entregando leads â€œfrescosâ€ antes da concorrÃªncia.
+        </p>
+      </div>
+
+      <div class="roadmap-card">
+        <span class="roadmap-tag">Enriquecimento & IA</span>
+        <h4>Lead Score, CNPJ & comportamento</h4>
+        <p>
+          Enriquecer leads com dados de CNPJ, redes sociais, geolocalizaÃ§Ã£o, 
+          horÃ¡rio de funcionamento e histÃ³rico de navegaÃ§Ã£o.
+        </p>
+        <p>
+          IA atribui score de 0 a 100, classifica topo/meio/fundo de funil
+          e sugere prioridade de atendimento.
+        </p>
+      </div>
+
+      <div class="roadmap-card">
+        <span class="roadmap-tag">CRM 360</span>
+        <h4>Kanban, linha do tempo e tarefas</h4>
+        <p>
+          Pipeline visual com colunas configurÃ¡veis (Novo â†’ Qualificado â†’ Proposta â†’ Fechamento),
+          linha do tempo do lead com histÃ³rico de interaÃ§Ãµes e tarefas associadas.
+        </p>
+        <p>
+          AtribuiÃ§Ã£o automÃ¡tica por regiÃ£o, categoria, ou carga de trabalho do vendedor.
+        </p>
+      </div>
+
+      <div class="roadmap-card">
+        <span class="roadmap-tag">AutomaÃ§Ã£o</span>
+        <h4>WhatsApp & fluxos inteligentes</h4>
+        <p>
+          SequÃªncias automÃ¡ticas via API de WhatsApp: boas-vindas, follow-ups,
+          recuperaÃ§Ã£o de orÃ§amento perdido, lembretes de proposta.
+        </p>
+        <p>
+          Gatilhos configurÃ¡veis: â€œse veio do Maps, manda para o vendedor Xâ€,
+          â€œse ficou parado 7 dias, dispara reengajamentoâ€.
+        </p>
+      </div>
+
+      <div class="roadmap-card">
+        <span class="roadmap-tag">BI & PrevisÃ£o</span>
+        <h4>Painel de inteligÃªncia</h4>
+        <p>
+          Dashboards com origem de leads, conversÃ£o por canal, horÃ¡rios de maior captura,
+          mapa de calor geogrÃ¡fico e indicadores de perda.
+        </p>
+        <p>
+          Modelo de IA calcula probabilidade de fechamento e sugere
+          os prÃ³ximos leads a serem atacados pela equipe.
+        </p>
+      </div>
+
+      <div class="roadmap-card">
+        <span class="roadmap-tag">Modo AgÃªncia & Marketplace</span>
+        <h4>Escala comercial</h4>
+        <p>
+          Subcontas para clientes, painel com marca branca, planos por assinatura,
+          venda de mÃ³dulos extras (plugins, templates de automaÃ§Ã£o, pacotes de IA).
+        </p>
+        <p>
+          Marketplace para comercializar capturas de nichos especÃ­ficos e integraÃ§Ãµes avanÃ§adas.
+        </p>
+      </div>
+    </div>
+
+    <div style="margin-top:14px;font-size:12px;color:#9ca3af;">
+      Para investidores, o desenho Ã© claro: comeÃ§ar como um â€œmotor de leadsâ€ multi-fonte,
+      evoluir para um CRM de performance com automaÃ§Ã£o nativa e, por fim, abrir um ecossistema
+      com modo agÃªncia e marketplace prÃ³prio. Tudo apoiado na mesma base tÃ©cnica jÃ¡ em construÃ§Ã£o.
+    </div>
+  </section>
+
+  <div class="footer-note">
+    Este HTML Ã© uma apresentaÃ§Ã£o conceitual da plataforma. Os mÃ³dulos de captura, padronizaÃ§Ã£o
+    e multi-conta jÃ¡ estÃ£o implementados no backend; os blocos de CRM, automaÃ§Ã£o, BI e marketplace
+    compÃµem o roadmap de evoluÃ§Ã£o para um verdadeiro sistema de Marketing 360 SaaS.
+  </div>
+</body>
+</html>
